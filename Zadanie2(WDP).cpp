@@ -21,7 +21,7 @@ int GetRandomNumber(int min, int max)
 /// pobierz piętro i pokój od użytkownika
 /// </summary>
 void ChooseRoom() {
-	printf("prosze podac pietro (0 - %d): ", floors);
+	printf("prosze podac pietro (0 - %d): ", floors - 1);
 	cin >> choosingFloor;
 
 	printf("prosze podac pietro (1 - %d): ", rooms);
@@ -33,8 +33,9 @@ int main()
 {
 	srand(time(NULL));
 
-	int hotel[floors][rooms]{}, i{}, actualFloor{}, actualRoom{},
-		totalGuests{}, choosingOperation;
+	unsigned int hotel[floors][rooms]{};
+	int i{}, actualFloor{},
+		actualRoom{}, totalGuests{}, choosingOperation;
 
 	// wypełnić hotel gośćmi
 	do {
@@ -65,15 +66,18 @@ int main()
 			// zameldować się
 			case 1: 
 				ChooseRoom();
-				// nie robić nic, jeśli w pokoju jest już 2 gości
-				if (hotel[choosingFloor][choosingRoom] != 2) hotel[choosingFloor][choosingRoom]++;
+				// zameldować się gościa
+				if (hotel[choosingFloor][choosingRoom] == 0)
+					hotel[choosingFloor][choosingRoom] = ~hotel[choosingFloor][choosingRoom] >> 31;
+				else if (hotel[choosingFloor][choosingRoom] == 1)
+					hotel[choosingFloor][choosingRoom] <<= 1;
 				break;
 
 			// eksmitowac
 			case 2:
 				ChooseRoom();
-				// nie robić nic, jeśli pokój jest pusty
-				if (hotel[choosingFloor][choosingRoom] != 0) hotel[choosingFloor][choosingRoom]--;
+				// eksmitowac gościa
+				hotel[choosingFloor][choosingRoom] >>= 1;
 				break;
 
 			// pokazać wszystkie pokoje hotelowe
