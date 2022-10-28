@@ -2,6 +2,9 @@
 
 using namespace std;
 
+int choosingFloor, choosingRoom;
+const int floors = 3, rooms = 5;
+
 /// <summary>
 /// metoda, która zwraca losową liczbę w określonym zakresie
 /// </summary>
@@ -11,29 +14,37 @@ using namespace std;
 int GetRandomNumber(int min, int max)
 {
 	// otrzymać losową liczbę
-	int num = min + rand() % (max - min + 1);
+	return min + rand() % (max - min + 1);
+}
 
-	return num;
+/// <summary>
+/// pobierz piętro i pokój od użytkownika
+/// </summary>
+void ChooseRoom() {
+	printf("prosze podac pietro (0 - %d): ", floors);
+	cin >> choosingFloor;
+
+	printf("prosze podac pietro (1 - %d): ", rooms);
+	cin >> choosingRoom;
+	choosingRoom--;
 }
 
 int main()
 {
 	srand(time(NULL));
 
-	const int floors = 3, rooms = 5;
 	int hotel[floors][rooms]{}, i{}, actualFloor{}, actualRoom{},
-		totalGuests{}, choosingOperation, choosingFloor, choosingRoom;
+		totalGuests{}, choosingOperation;
 
+	// wypełnić hotel gośćmi
 	do {
-		bool rented;
+		bool rented = GetRandomNumber(0, 1) == 1 ? true : false;
 
-		GetRandomNumber(0, 1) == 1 ? rented = false : rented = true;
-
-		rented ? hotel[actualFloor][actualRoom] = GetRandomNumber(1, 2) : 
+		rented ? totalGuests += hotel[actualFloor][actualRoom] = GetRandomNumber(1, 2) :
 			hotel[actualFloor][actualRoom] = 0;
-		totalGuests += hotel[actualFloor][actualRoom];
 
-		if (actualRoom >= 4) {
+		// jeśli zakończono wypełnianie bieżącego piętra, przejdź do następnego piętra
+		if (actualRoom > floors) {
 			actualFloor++;
 			actualRoom = 0;
 		}
@@ -42,27 +53,49 @@ int main()
 		i++;
 	} while (floors * rooms > i);
 
-	printf("goscie w hotelu: %d\n\n Prosze wybrac opcje: 1) zameldować sie \
-		\n 2) eksmitowac\n 3) pokazac wszystkie pokoje hotelowe\n", totalGuests);
+	// wybrać, co zrobić z hotelem
+	printf("goscie w hotelu: %d\n\n1) zameldowac sie \
+		\n2) eksmitowac\n3) pokazac wszystkie pokoje hotelowe", totalGuests);
 	
 	while (true) {
+		cout << "\nProsze wybrac opcje: ";
 		cin >> choosingOperation;
 
 		switch (choosingOperation) {
+			// zameldować się
 			case 1: 
+				ChooseRoom();
+				// nie robić nic, jeśli w pokoju jest już 2 gości
+				if (hotel[choosingFloor][choosingRoom] != 2) hotel[choosingFloor][choosingRoom]++;
 				break;
+
+			// eksmitowac
 			case 2:
+				ChooseRoom();
+				// nie robić nic, jeśli pokój jest pusty
+				if (hotel[choosingFloor][choosingRoom] != 0) hotel[choosingFloor][choosingRoom]--;
 				break;
+
+			// pokazać wszystkie pokoje hotelowe
 			case 3:
+				cout << "\n";
+				actualFloor = actualRoom = 0;
+
+				for (int k = 0; k < floors * rooms; k++) {
+					cout << hotel[actualFloor][actualRoom] << " ";
+
+					if (actualRoom > floors) {
+						actualFloor++;
+						actualRoom = 0;
+						cout << "\n";
+					}
+					else
+						actualRoom++;
+				}
 				break;
+
 			default:
-				cout << "nie ma takiej operacji";
+				cout << " -- nie ma takiej operacji --\n";
 		}
-	}
-
-	cin >> choosingFloor;
-
-	if (choosingFloor < floors && choosingFloor > floors) {
-
 	}
 }
